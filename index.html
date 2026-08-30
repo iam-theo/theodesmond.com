@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Theo Desmond is a founder, product architect, full-stack engineer and AI strategist building scalable digital products, intelligent systems and technology ventures from Nigeria."
+    />
+    <meta
+      name="keywords"
+      content="Theo Desmond, product architect, full-stack engineer, AI strategist, software engineer Nigeria, FinTech infrastructure, AI agent infrastructure, digital product development"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Theo Desmond" />
+    <meta name="theme-color" content="#ffffff" id="theme-color" />
+    <link rel="canonical" href="https://theodesmond.com/" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script>
+      ;(function () {
+        var theme = null
+        try {
+          theme = localStorage.getItem("theme")
+        } catch (e) {}
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+        }
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark")
+          var meta = document.getElementById("theme-color")
+          if (meta) meta.setAttribute("content", "#09090b")
+        }
+      })()
+    </script>
+
+    <title>Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist</title>
+
+    <meta property="og:title" content="Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist" />
+    <meta
+      property="og:description"
+      content="Theo Desmond designs and builds scalable digital products, intelligent systems and technology ventures — from product strategy to production infrastructure."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://theodesmond.com/" />
+    <meta property="og:site_name" content="Theo Desmond" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://theodesmond.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist" />
+    <meta
+      name="twitter:description"
+      content="Founder, product architect, full-stack engineer and AI strategist building scalable digital products and intelligent systems."
+    />
+    <meta name="twitter:image" content="https://theodesmond.com/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Theo Desmond",
+        "url": "https://theodesmond.com",
+        "description": "Theo Desmond designs and builds scalable digital products, intelligent systems and technology platforms that turn complex ideas into real-world solutions."
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Theo Desmond",
+        "url": "https://theodesmond.com",
+        "jobTitle": "Founder, Product Architect & AI Strategist",
+        "description": "Founder, product architect, full-stack engineer and AI strategist building scalable digital products, intelligent systems and technology ventures.",
+        "knowsAbout": [
+          "Product Architecture",
+          "Full-Stack Engineering",
+          "AI & Intelligent Systems",
+          "FinTech Infrastructure",
+          "Technology Entrepreneurship"
+        ]
+      }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

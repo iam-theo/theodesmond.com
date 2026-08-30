@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+  font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+::selection {
+  @apply bg-indigo-600 text-white;
+}
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-indigo-600;
+}
+
+.scroll-mt {
+  scroll-margin-top: 5rem;
+}
+
+.layout {
+  @apply mx-auto w-full max-w-[100rem] px-6 sm:px-8 xl:px-10;
+}
+
+.eyebrow {
+  @apply inline-flex items-center gap-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500;
+}
+
+.eyebrow::before {
+  content: "";
+  @apply block h-px w-8 bg-indigo-600/60;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all;
+}
+
+.btn-primary {
+  @apply bg-zinc-900 text-white shadow-sm hover:bg-indigo-600 dark:bg-white dark:text-zinc-950 dark:hover:bg-indigo-500 dark:hover:text-white;
+}
+
+.btn-secondary {
+  @apply border border-zinc-300 bg-white text-zinc-900 hover:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-400;
+}
+
+/* --- Motion system --- */
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Product visual diagrams --- */
+
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.animate-dash {
+  stroke-dasharray: 6 8;
+  animation: dashflow 2.6s linear infinite;
+}
+
+@keyframes softpulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-softpulse {
+  animation: softpulse 3.2s ease-in-out infinite;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-floaty {
+  animation: floaty 7s ease-in-out infinite;
+}
+
+/* --- Spotlight hover --- */
+
+.spotlight {
+  position: relative;
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(99, 102, 241, 0.12),
+    transparent 70%
+  );
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .page-enter {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  .animate-dash,
+  .animate-softpulse,
+  .animate-floaty {
+    animation: none !important;
+  }
+}

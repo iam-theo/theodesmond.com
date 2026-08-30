@@ -1,0 +1,16 @@
+{
+  "redirects": [
+    { "source": "/about.php", "destination": "/about", "permanent": true },
+    { "source": "/about.html", "destination": "/about", "permanent": true },
+    { "source": "/index.php", "destination": "/", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/home", "destination": "/", "permanent": true },
+    { "source": "/pricing", "destination": "/portfolio", "permanent": true },
+    { "source": "/pricing.php", "destination": "/portfolio", "permanent": true },
+    { "source": "/products", "destination": "/portfolio", "permanent": true },
+    { "source": "/work.php", "destination": "/portfolio", "permanent": true },
+    { "source": "/contact.php", "destination": "/contact", "permanent": true },
+    { "source": "/blog.php", "destination": "/blog", "permanent": true }
+  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
