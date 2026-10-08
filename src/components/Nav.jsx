@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react"
 import { Link, NavLink } from "react-router-dom"
-import { nav } from "../data"
+import { nav as defaultNav, branding as defaultBranding } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 import ThemeToggle from "./ThemeToggle"
 
 export default function Nav() {
+  const content = useSiteContent()
+  const nav = content?.nav ?? defaultNav
+  const branding = content?.branding ?? defaultBranding
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -31,11 +35,15 @@ export default function Nav() {
         }`}
       >
         <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-950 font-mono text-sm font-semibold text-white dark:bg-indigo-500 dark:text-zinc-950">
-            TD
-          </span>
+          {branding.logoImage ? (
+            <img src={branding.logoImage} alt="Theo Desmond" className="h-8 w-8 rounded-lg object-cover" />
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-950 font-mono text-sm font-semibold text-white dark:bg-indigo-500 dark:text-zinc-950">
+              {branding.mark || "TD"}
+            </span>
+          )}
           <span className="font-mono text-sm font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
-            theo<span className="text-indigo-600 dark:text-indigo-400">desmond</span>
+            {branding.nameBefore || "theo"}<span className="text-indigo-600 dark:text-indigo-400">{branding.nameAfter || "desmond"}</span>
           </span>
         </Link>
 
@@ -49,7 +57,7 @@ export default function Nav() {
               </NavLink>
             ))}
             <Link
-              to="/contact"
+              to="/work"
               className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-600 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-indigo-500 dark:hover:text-white"
             >
               Work With Theo
@@ -102,7 +110,7 @@ export default function Nav() {
               </Link>
             ))}
             <Link
-              to="/contact"
+              to="/work"
               onClick={() => setOpen(false)}
               className="mt-2 rounded-lg bg-zinc-900 px-3 py-2.5 text-center text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-950"
             >

@@ -1,0 +1,18 @@
+{
+  "name": "@aurex/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./attachments": "./src/attachments.ts",
+    "./import": "./src/import.ts",
+    "./project-detect": "./src/project-detect.ts",
+    "./prompts": "./src/prompts/prompts.ts",
+    "./prompts/prompts": "./src/prompts/prompts.ts",
+    "./agent-prompt": "./src/agent-prompt.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

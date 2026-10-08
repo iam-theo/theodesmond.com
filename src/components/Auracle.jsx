@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom"
 import Section from "./Section"
-import { auracle } from "../data"
+import { auracle as defaultAuracle } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Auracle({
   eyebrow = "The Technology Company",
   title = "Auracle Technologies",
 }) {
+  const content = useSiteContent()
+  const auracle = content?.auracle ?? defaultAuracle
   return (
     <Section id="auracle" eyebrow={eyebrow} title={title}>
       <p className="mt-6 max-w-2xl text-xl font-bold text-indigo-600 dark:text-indigo-400">
@@ -24,7 +27,7 @@ export default function Auracle({
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-indigo-600 dark:text-indigo-400">
               Auracle
             </p>
-            <p className="mt-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">Ecosystem</p>
+            <p className="mt-1 text-lg font-bold text-white dark:text-zinc-100">Ecosystem</p>
           </div>
 
           <div className="mx-auto h-8 w-px bg-zinc-300 dark:bg-zinc-700" />
@@ -43,7 +46,7 @@ export default function Auracle({
                 key={e.name}
                 className="rounded-xl border border-zinc-200 bg-white p-6 text-center transition-all hover:-translate-y-0.5 hover:border-indigo-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-500/60"
               >
-                <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">{e.name}</p>
+                <p className="text-base font-bold text-white dark:text-zinc-100">{e.name}</p>
                 <span className="mt-2 inline-block rounded-full bg-indigo-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300">
                   {e.domain}
                 </span>
@@ -64,7 +67,7 @@ export default function Auracle({
               key={p.name}
               className="flex flex-wrap items-center gap-x-6 gap-y-1.5 py-5"
             >
-              <span className="min-w-36 text-base font-bold text-zinc-900 dark:text-zinc-100">
+              <span className="min-w-36 text-base font-bold text-white dark:text-zinc-100">
                 {p.name}
               </span>
               <span className="rounded-md bg-zinc-100 px-2.5 py-1 font-mono text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">

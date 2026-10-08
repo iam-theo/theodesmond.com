@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { EMOJIS, applyReaction, viewerKey } from "./commentUtils"
-import { supabase, isSupabaseConfigured } from "../lib/supabase"
+import { EMOJIS, applyReaction, viewerKey, maskEmail } from "./commentUtils"
+import { api } from "../lib/api"
 
 const avatarColors = [
   "bg-indigo-500",
@@ -9,8 +9,8 @@ const avatarColors = [
   "bg-amber-500",
   "bg-sky-500",
   "bg-violet-500",
-  "bg-teal-500",
-  "bg-pink-500",
+  "bg-zinc-500",
+  "bg-zinc-500",
 ]
 
 function colorFor(name) {
@@ -51,13 +51,15 @@ function mapComment(list, id, fn) {
 
 function CommentForm({ label, compact = false, onSubmit }) {
   const [name, setName] = useState(() => localStorage.getItem("td-comment-name") || "")
+  const [email, setEmail] = useState(() => localStorage.getItem("td-comment-email") || "")
   const [text, setText] = useState("")
 
   const submit = (e) => {
     e.preventDefault()
     if (!name.trim() || !text.trim()) return
     localStorage.setItem("td-comment-name", name.trim())
-    onSubmit(name.trim(), text.trim())
+    if (email.trim()) localStorage.setItem("td-comment-email", email.trim())
+    onSubmit(name.trim(), text.trim(), email.trim() || null)
     setText("")
   }
 
@@ -76,6 +78,13 @@ function CommentForm({ label, compact = false, onSubmit }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
           className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 font-mono text-xs text-zinc-700 outline-none transition-colors placeholder:text-zinc-400 focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+        />
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="Email (optional — only to get notified of replies, never shown)"
+          className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 font-mono text-xs text-zinc-700 outline-none transition-colors placeholder:text-zinc-400 focus:border-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
         />
         <textarea
           value={text}
@@ -121,6 +130,11 @@ function Comment({ comment, onReply, onReact }) {
           <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             {comment.author}
           </p>
+          {comment.email && (
+            <p className="font-mono text-[10px] tracking-wide text-zinc-400 dark:text-zinc-500">
+              {maskEmail(comment.email)}
+            </p>
+          )}
           <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
             {comment.text}
           </p>
@@ -189,8 +203,8 @@ function Comment({ comment, onReply, onReact }) {
             <CommentForm
               label="Write a reply..."
               compact
-              onSubmit={(author, text) => {
-                onReply(comment.id, author, text)
+              onSubmit={(author, text, email) => {
+                onReply(comment.id, author, text, email)
                 setReplying(false)
               }}
             />
@@ -214,7 +228,8 @@ function countAll(nodes) {
 }
 
 export default function Comments({ slug }) {
-  const remote = isSupabaseConfigured
+  const [mode, setMode] = useState("loading") // loading | remote | local
+  const remote = mode === "remote"
   const storageKey = `td-comments-${slug}`
 
   const [localComments, setLocalComments] = useState(() => {
@@ -239,63 +254,36 @@ export default function Comments({ slug }) {
   }, [remote, storageKey, localComments])
 
   useEffect(() => {
-    if (!remote) return
-    let channel
+    let alive = true
+    let timer
 
     const loadAll = async () => {
-      const [c, r] = await Promise.all([
-        supabase
-          .from("comments")
-          .select("*")
-          .eq("post_slug", slug)
-          .order("created_at", { ascending: true }),
-        supabase.from("comment_reactions").select("*").eq("post_slug", slug),
-      ])
-      if (!c.error) setRows(c.data || [])
-      if (!r.error) setReactions(r.data || [])
-      setReady(true)
+      try {
+        const data = await api.get(`/api/comments?post_slug=${encodeURIComponent(slug)}`)
+        if (!alive) return
+        setRows(Array.isArray(data?.comments) ? data.comments : [])
+        setReactions(Array.isArray(data?.reactions) ? data.reactions : [])
+        setMode("remote")
+        setReady(true)
+      } catch {
+        if (alive) {
+          setMode("local")
+          setReady(true)
+        }
+      }
     }
 
     loadAll()
-
-    channel = supabase
-      .channel(`comments-${slug}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "comments", filter: `post_slug=eq.${slug}` },
-        loadAll
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "comments", filter: `post_slug=eq.${slug}` },
-        loadAll
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "comment_reactions",
-          filter: `post_slug=eq.${slug}`,
-        },
-        loadAll
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          schema: "public",
-          table: "comment_reactions",
-          filter: `post_slug=eq.${slug}`,
-        },
-        loadAll
-      )
-      .subscribe()
+    // Poll for new comments (replaces realtime channel).
+    timer = setInterval(() => {
+      if (document.visibilityState === "visible") loadAll()
+    }, 15000)
 
     return () => {
-      channel?.unsubscribe()
+      alive = false
+      clearInterval(timer)
     }
-  }, [remote, slug])
+  }, [slug])
 
   const comments = useMemo(() => {
     if (!remote) return localComments
@@ -313,6 +301,7 @@ export default function Comments({ slug }) {
       id: r.id,
       parent_id: r.parent_id,
       author: r.author,
+      email: r.email,
       text: r.text,
       createdAt: Date.parse(r.created_at),
       reactions: counts[r.id] || {},
@@ -329,17 +318,44 @@ export default function Comments({ slug }) {
     return roots
   }, [remote, localComments, rows, reactions])
 
-  const addComment = async (author, text) => {
+  const notifyReply = async (to, author, text) => {
+    if (!to) return
+    try {
+      await api.post("/api/comments/notify", {
+        to,
+        reply_author: author,
+        reply_text: text.slice(0, 400),
+        post_slug: slug,
+      })
+    } catch {
+      /* notifications are best-effort */
+    }
+  }
+
+  const refresh = async () => {
+    try {
+      const data = await api.get(`/api/comments?post_slug=${encodeURIComponent(slug)}`)
+      setRows(Array.isArray(data?.comments) ? data.comments : [])
+      setReactions(Array.isArray(data?.reactions) ? data.reactions : [])
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const addComment = async (author, text, email = null) => {
     if (remote) {
-      const { error } = await supabase
-        .from("comments")
-        .insert({ post_slug: slug, parent_id: null, author, text })
-      if (error) console.warn("Failed to post comment:", error.message)
+      try {
+        await api.post("/api/comments", { post_slug: slug, parent_id: null, author, text, email })
+        refresh()
+      } catch (err) {
+        console.warn("Failed to post comment:", err.message)
+      }
       return
     }
     const c = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       author,
+      email,
       text,
       createdAt: Date.now(),
       reactions: {},
@@ -349,17 +365,22 @@ export default function Comments({ slug }) {
     setLocalComments((cs) => [c, ...cs])
   }
 
-  const addReply = async (id, author, text) => {
+  const addReply = async (id, author, text, email = null) => {
     if (remote) {
-      const { error } = await supabase
-        .from("comments")
-        .insert({ post_slug: slug, parent_id: id, author, text })
-      if (error) console.warn("Failed to post reply:", error.message)
+      try {
+        await api.post("/api/comments", { post_slug: slug, parent_id: id, author, text, email })
+        const parent = rows.find((r) => r.id === id)
+        notifyReply(parent?.email, author, text)
+        refresh()
+      } catch (err) {
+        console.warn("Failed to post reply:", err.message)
+      }
       return
     }
     const r = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       author,
+      email,
       text,
       createdAt: Date.now(),
       reactions: {},
@@ -374,24 +395,17 @@ export default function Comments({ slug }) {
   const toggleReaction = async (commentId, emoji) => {
     const key = viewerKey()
     if (remote) {
-      const { data } = await supabase
-        .from("comment_reactions")
-        .select("id")
-        .eq("comment_id", commentId)
-        .eq("emoji", emoji)
-        .eq("user_key", key)
-        .maybeSingle()
-      if (data) {
-        await supabase.from("comment_reactions").delete().eq("id", data.id)
-      } else {
-        await supabase
-          .from("comment_reactions")
-          .delete()
-          .eq("comment_id", commentId)
-          .eq("user_key", key)
-        await supabase
-          .from("comment_reactions")
-          .insert({ post_slug: slug, comment_id: commentId, emoji, user_key: key })
+      try {
+        await api.post("/api/reactions/toggle", {
+          scope: "comment",
+          post_slug: slug,
+          comment_id: commentId,
+          emoji,
+          user_key: key,
+        })
+        refresh()
+      } catch {
+        /* ignore */
       }
       return
     }
@@ -407,7 +421,7 @@ export default function Comments({ slug }) {
       <h2 className="flex items-center gap-3 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         Comments <span className="text-zinc-400 dark:text-zinc-500">({count})</span>
         {remote && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/30">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-500/30 dark:text-emerald-300">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" aria-hidden />
             Live
           </span>

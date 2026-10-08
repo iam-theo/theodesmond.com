@@ -1,11 +1,14 @@
 import Section from "./Section"
-import { currentFocus } from "../data"
+import { currentFocus as defaultCurrentFocus } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function CurrentFocus({
   eyebrow = "06 · Current Focus",
   title = "What I'm building now.",
   updated = "Updated August 2026",
 }) {
+  const content = useSiteContent()
+  const currentFocus = content?.currentFocus ?? defaultCurrentFocus
   return (
     <Section
       id="focus"

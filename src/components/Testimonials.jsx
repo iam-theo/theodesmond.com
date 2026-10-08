@@ -1,7 +1,10 @@
 import Section from "./Section"
-import { testimonials } from "../data"
+import { testimonials as defaultTestimonials } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Testimonials() {
+  const content = useSiteContent()
+  const testimonials = content?.testimonials ?? defaultTestimonials
   return (
     <Section
       id="testimonials"
@@ -29,7 +32,7 @@ export default function Testimonials() {
               {t.quote}
             </blockquote>
             <figcaption className="mt-auto pt-8">
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
+              <p className="text-sm font-semibold text-white dark:text-zinc-100">{t.name}</p>
               <p className="mt-1 font-mono text-xs text-zinc-400 dark:text-zinc-500">{t.role}</p>
             </figcaption>
           </figure>

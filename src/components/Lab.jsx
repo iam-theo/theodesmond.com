@@ -1,15 +1,18 @@
 import Section from "./Section"
-import { lab, statusColors } from "../data"
+import { lab as defaultLab, statusColors, labIntro as defaultLabIntro } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Lab({
   eyebrow = "09 · Technical Lab",
   title = "The Lab.",
 }) {
+  const content = useSiteContent()
+  const lab = content?.lab ?? defaultLab
+  const labIntro = content?.labIntro ?? defaultLabIntro
   return (
     <Section id="lab" eyebrow={eyebrow} title={title}>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-        Not a static CV — an active technology laboratory. Things I&apos;m building, testing and
-        shipping right now.
+        {labIntro}
       </p>
 
       <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800 sm:grid-cols-2 lg:grid-cols-3">

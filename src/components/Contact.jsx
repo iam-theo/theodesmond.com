@@ -1,7 +1,8 @@
 import { useState } from "react"
 import Section from "./Section"
-import { supabase, isSupabaseConfigured } from "../lib/supabase"
-import { contactCategories } from "../data"
+import { api } from "../lib/api"
+import { contactCategories as defaultContactCategories, contactIntro as defaultContactIntro } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 const inputClass =
   "w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
@@ -17,10 +18,13 @@ export default function Contact({
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
+  const content = useSiteContent()
+  const contactCategories = content?.contactCategories ?? defaultContactCategories
+  const contactIntro = content?.contactIntro ?? defaultContactIntro
   const [form, setForm] = useState({
     name: "",
     email: "",
-    category: contactCategories[0],
+    category: defaultContactCategories[0],
     message: "",
   })
 
@@ -34,35 +38,30 @@ export default function Contact({
       return
     }
     setError("")
-
-    if (isSupabaseConfigured) {
-      setSending(true)
-      const { error: dbError } = await supabase.from("contacts").insert({
+    setSending(true)
+    try {
+      await api.post("/api/contact", {
         name: form.name.trim(),
         email: form.email.trim(),
         category: form.category,
         message: form.message.trim(),
       })
       setSending(false)
-      if (dbError) {
-        setError("Something went wrong sending your message. Please try again or email me directly.")
-        return
-      }
       setSent(true)
-      return
+    } catch {
+      // API unreachable (e.g. dev without server) — fall back to email.
+      const subject = encodeURIComponent(`Project inquiry — ${form.category}`)
+      const body = encodeURIComponent(`${form.message.trim()}\n\n— ${form.name.trim()} (${form.email.trim()})`)
+      window.location.href = `mailto:hello@theodesmond.com?subject=${subject}&body=${body}`
+      setSending(false)
+      setSent(true)
     }
-
-    const subject = encodeURIComponent(`Project inquiry — ${form.category}`)
-    const body = encodeURIComponent(`${form.message.trim()}\n\n— ${form.name.trim()} (${form.email.trim()})`)
-    window.location.href = `mailto:hello@theodesmond.com?subject=${subject}&body=${body}`
-    setSent(true)
   }
 
   return (
     <Section id="contact" eyebrow={eyebrow} title={title} className="border-t-0">
       <p className="mt-8 max-w-2xl text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
-        I&apos;m interested in ambitious products, complex engineering problems and opportunities
-        where technology can create measurable impact.
+        {contactIntro}
       </p>
 
       {sent ? (
@@ -72,8 +71,7 @@ export default function Contact({
           </p>
           <p className="mt-3 text-sm leading-relaxed text-emerald-800 dark:text-emerald-200">
             Thanks for reaching out — I&apos;ll get back to you within a day or two.
-            {isSupabaseConfigured &&
-              " Your message has been logged in my inbox."}
+            Your message has been logged in my inbox.
           </p>
         </div>
       ) : (

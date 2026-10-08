@@ -1,10 +1,13 @@
 import Section from "./Section"
-import { beliefs } from "../data"
+import { beliefs as defaultBeliefs } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Beliefs({
   eyebrow = "03 · What I Believe",
   title = "What I believe.",
 }) {
+  const content = useSiteContent()
+  const beliefs = content?.beliefs ?? defaultBeliefs
   return (
     <Section
       id="beliefs"

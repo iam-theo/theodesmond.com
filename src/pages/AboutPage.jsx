@@ -8,8 +8,13 @@ import BeyondSoftware from "../components/BeyondSoftware"
 import CurrentFocus from "../components/CurrentFocus"
 import Portrait from "../components/Portrait"
 import AboutCta from "../components/AboutCta"
+import { useSiteContent } from "../hooks/useSiteContent"
+import { roles as defaultRoles, tagline as defaultTagline } from "../data"
 
 export default function AboutPage() {
+  const content = useSiteContent()
+  const roles = content?.roles ?? defaultRoles
+  const tagline = content?.tagline ?? defaultTagline
   return (
     <>
       <PageHeader
@@ -19,14 +24,14 @@ export default function AboutPage() {
             Building technology <span className="text-indigo-600 dark:text-indigo-400">with a purpose.</span>
           </>
         }
-        description="Founder · Product Architect · Full-Stack Engineer · AI Strategist. I design and build products, intelligent systems and digital ventures — with the people who use them in mind."
+        description={`${roles.join(" · ")}. ${tagline} — with the people who use them in mind.`}
         grid
       >
         <div className="mt-10 flex flex-wrap gap-4">
           <Link to="/portfolio" className="btn btn-primary">
             Explore My Work <span>→</span>
           </Link>
-          <Link to="/contact" className="btn btn-secondary">
+          <Link to="/work" className="btn btn-secondary">
             Work With Me <span>→</span>
           </Link>
         </div>

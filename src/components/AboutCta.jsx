@@ -20,7 +20,7 @@ export default function AboutCta({
           </p>
         </div>
         <Link
-          to="/contact"
+          to="/work"
           className="btn group bg-white text-indigo-950 hover:bg-indigo-100"
         >
           Let&apos;s Build

@@ -1,18 +1,22 @@
 import PageHeader from "../components/PageHeader"
 import Company from "../components/Company"
 import Auracle from "../components/Auracle"
+import { useSiteContent } from "../hooks/useSiteContent"
+import { pageHeaders as defaultPageHeaders } from "../data"
 
 export default function VenturesPage() {
+  const content = useSiteContent()
+  const header = content?.pageHeaders?.ventures ?? defaultPageHeaders.ventures
   return (
     <>
       <PageHeader
-        eyebrow="Ventures"
+        eyebrow={header.eyebrow}
         title={
           <>
-            The ventures <span className="text-indigo-600">behind the work.</span>
+            {header.titleBefore}<span className="text-indigo-600">{header.titleAccent}</span>
           </>
         }
-        description="Two entities, one mission: turning ideas into businesses, products and intelligent systems. One is the business venture. The other builds the technology."
+        description={header.description}
         grid
       />
 

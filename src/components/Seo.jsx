@@ -3,6 +3,7 @@ import {
   SITE_URL,
   SITE_NAME,
   SITE_DEFAULT_IMAGE,
+  AUTHOR,
   canonicalUrl,
 } from "../lib/seo"
 
@@ -15,6 +16,22 @@ function upsertMeta(attr, key, content) {
     document.head.appendChild(el)
   }
   el.setAttribute("content", content)
+}
+
+function setArticleTags(tags = []) {
+  document.head
+    .querySelectorAll('meta[property="article:tag"]')
+    .forEach((el) => el.remove())
+  tags
+    .map((t) => String(t).trim())
+    .filter(Boolean)
+    .slice(0, 10)
+    .forEach((tag) => {
+      const el = document.createElement("meta")
+      el.setAttribute("property", "article:tag")
+      el.setAttribute("content", tag)
+      document.head.appendChild(el)
+    })
 }
 
 function upsertCanonical(href) {
@@ -46,6 +63,7 @@ export default function Seo({
   image = SITE_DEFAULT_IMAGE,
   ogType = "website",
   jsonLd = null,
+  article = null,
 }) {
   const canonical = canonicalUrl(path || "/")
   const ogTitle = title
@@ -56,11 +74,18 @@ export default function Seo({
     () => (Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : []),
     [jsonLd]
   )
+  const articlePublished = article?.publishedTime || ""
+  const articleModified = article?.modifiedTime || ""
+  const articleSection = article?.section || ""
+  const articleAuthorUrl = article?.authorUrl || ""
+  const articleTagsKey = (article?.tags || []).join("|")
+  const hasArticle = ogType === "article" && Boolean(article)
 
   useEffect(() => {
     document.title = title
 
     upsertMeta("name", "description", description)
+    upsertMeta("name", "author", AUTHOR)
     upsertMeta("name", "robots", "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1")
     if (keywordsKey) upsertMeta("name", "keywords", keywordsKey.replace(/\|/g, ", "))
     upsertCanonical(canonical)
@@ -77,6 +102,17 @@ export default function Seo({
     upsertMeta("name", "twitter:title", ogTitle)
     upsertMeta("name", "twitter:description", ogDescription)
     upsertMeta("name", "twitter:image", fullImage)
+    upsertMeta("name", "twitter:creator", "@iam__theo")
+
+    if (hasArticle) {
+      upsertMeta("property", "article:published_time", articlePublished)
+      upsertMeta("property", "article:modified_time", articleModified)
+      upsertMeta("property", "article:section", articleSection)
+      upsertMeta("property", "article:author", articleAuthorUrl || `${SITE_URL}/about`)
+      setArticleTags(articleTagsKey ? articleTagsKey.split("|") : [])
+    } else {
+      setArticleTags([])
+    }
 
     if (jsonLdItems.length) {
       jsonLdItems.forEach((ld, i) => upsertJsonLd(`jsonld-${i}`, ld))
@@ -92,6 +128,12 @@ export default function Seo({
     ogDescription,
     fullImage,
     ogType,
+    hasArticle,
+    articlePublished,
+    articleModified,
+    articleSection,
+    articleAuthorUrl,
+    articleTagsKey,
     jsonLdItems,
   ])
 

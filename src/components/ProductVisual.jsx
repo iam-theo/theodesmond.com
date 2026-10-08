@@ -23,6 +23,18 @@ const accents = {
     text: "fill-violet-600 dark:fill-violet-300",
     dot: "fill-violet-500 dark:fill-violet-400",
   },
+  rose: {
+    soft: "fill-rose-100 dark:fill-rose-500/20",
+    stroke: "stroke-rose-500 dark:stroke-rose-400",
+    text: "fill-rose-600 dark:fill-rose-300",
+    dot: "fill-rose-500 dark:fill-rose-400",
+  },
+  amber: {
+    soft: "fill-amber-100 dark:fill-amber-500/20",
+    stroke: "stroke-amber-500 dark:stroke-amber-400",
+    text: "fill-amber-600 dark:fill-amber-300",
+    dot: "fill-amber-500 dark:fill-amber-400",
+  },
 }
 
 const node = "fill-zinc-100 stroke-zinc-300 dark:fill-zinc-800 dark:stroke-zinc-600"
@@ -206,14 +218,157 @@ function Agents({ a }) {
   )
 }
 
+function Panel({ a }) {
+  return (
+    <>
+      <path d="M116 37 L150 64" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M116 133 L150 106" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 64 L284 37" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 84 L284 84" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 106 L284 133" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+
+      <rect x="20" y="20" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="68" y="41" textAnchor="middle" className={label}>
+        Services
+      </text>
+
+      <rect x="20" y="116" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="68" y="137" textAnchor="middle" className={label}>
+        Domains
+      </text>
+
+      <rect x="284" y="20" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="332" y="41" textAnchor="middle" className={label}>
+        Containers
+      </text>
+
+      <rect x="284" y="116" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="332" y="137" textAnchor="middle" className={label}>
+        Database
+      </text>
+
+      <rect x="150" y="52" width="100" height="66" rx="16" className={a.soft} strokeWidth="2" />
+      <rect x="150" y="52" width="100" height="66" rx="16" className={a.stroke} fill="none" strokeWidth="2" />
+      <circle cx="170" cy="70" r="4" className={`${a.dot} animate-softpulse`} />
+      <text x="200" y="76" textAnchor="middle" className={a.text}>
+        PANEL
+      </text>
+      <text x="200" y="100" textAnchor="middle" className={label}>
+        one control plane
+      </text>
+    </>
+  )
+}
+
+function Hrms({ a }) {
+  return (
+    <>
+      <path d="M96 85 L150 85" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 60 L284 37" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 85 L284 85" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M250 110 L284 133" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+
+      <rect x="14" y="56" width="82" height="58" rx="14" className={node} strokeWidth="1.5" />
+      <text x="55" y="80" textAnchor="middle" className={label}>
+        People
+      </text>
+      <text x="55" y="96" textAnchor="middle" className="fill-zinc-400 dark:fill-zinc-500 text-[8.5px]">
+        hire → pay
+      </text>
+
+      <rect x="150" y="46" width="100" height="78" rx="18" className={a.soft} strokeWidth="2" />
+      <rect x="150" y="46" width="100" height="78" rx="18" className={a.stroke} fill="none" strokeWidth="2" />
+      <circle cx="170" cy="64" r="4" className={`${a.dot} animate-softpulse`} />
+      <text x="200" y="70" textAnchor="middle" className={a.text}>
+        HRMS
+      </text>
+      <text x="200" y="104" textAnchor="middle" className={label}>
+        one system
+      </text>
+
+      <rect x="284" y="20" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="332" y="41" textAnchor="middle" className={label}>
+        Payroll
+      </text>
+
+      <rect x="284" y="68" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="332" y="89" textAnchor="middle" className={label}>
+        Leave &amp; Time
+      </text>
+
+      <rect x="284" y="116" width="96" height="34" rx="10" className={node} strokeWidth="1.5" />
+      <text x="332" y="137" textAnchor="middle" className={label}>
+        Performance
+      </text>
+    </>
+  )
+}
+
+function Notify({ a }) {
+  return (
+    <>
+      <path d="M96 85 C 130 85, 150 85, 176 85" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M278 72 C 300 55, 306 52, 318 48" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+      <path d="M278 98 C 300 115, 306 118, 318 122" className={`${wire} animate-dash`} fill="none" strokeWidth="2" />
+
+      <rect x="14" y="58" width="82" height="54" rx="14" className={node} strokeWidth="1.5" />
+      <text x="55" y="80" textAnchor="middle" className={label}>
+        Your App
+      </text>
+      <text x="55" y="96" textAnchor="middle" className="fill-zinc-400 dark:fill-zinc-500 text-[8.5px]">
+        sends
+      </text>
+
+      <rect x="176" y="58" width="102" height="54" rx="14" className={a.soft} strokeWidth="2" />
+      <rect x="176" y="58" width="102" height="54" rx="14" className={a.stroke} fill="none" strokeWidth="2" />
+      <circle cx="194" cy="76" r="4" className={`${a.dot} animate-softpulse`} />
+      <text x="227" y="82" textAnchor="middle" className={a.text}>
+        Notify API
+      </text>
+      <text x="227" y="98" textAnchor="middle" className={label}>
+        templates
+      </text>
+
+      <rect x="318" y="22" width="70" height="44" rx="12" className={node} strokeWidth="1.5" />
+      <text x="353" y="48" textAnchor="middle" className={label}>
+        WABA
+      </text>
+
+      <rect x="318" y="104" width="70" height="44" rx="12" className={node} strokeWidth="1.5" />
+      <text x="353" y="130" textAnchor="middle" className={label}>
+        WhatsApp
+      </text>
+    </>
+  )
+}
+
 const variants = {
   hub: Hub,
   payments: Payments,
   workflow: Workflow,
   agents: Agents,
+  panel: Panel,
+  hrms: Hrms,
+  notify: Notify,
 }
 
-export default function ProductVisual({ variant = "hub", accent = "indigo", className = "h-full w-full" }) {
+import { useState } from "react"
+
+export default function ProductVisual({ variant = "hub", accent = "indigo", className = "h-full w-full", image = null, alt = "" }) {
+  const [failed, setFailed] = useState(false)
+
+  if (image && !failed) {
+    return (
+      <img
+        src={image}
+        alt={alt}
+        loading="lazy"
+        className={`${className} object-cover object-top`}
+        onError={() => setFailed(true)}
+      />
+    )
+  }
+
   const a = accents[accent] || accents.indigo
   const Diagram = variants[variant] || variants.hub
   return (

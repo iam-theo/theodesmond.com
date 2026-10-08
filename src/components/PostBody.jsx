@@ -1,4 +1,6 @@
 export default function PostBody({ blocks }) {
+  let firstPara = true
+
   return (
     <div className="mt-14">
       {blocks.map((block, i) => {
@@ -7,25 +9,30 @@ export default function PostBody({ blocks }) {
             return (
               <h2
                 key={i}
-                className="mt-12 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl"
+                className="mt-14 font-display text-2xl font-semibold tracking-tight text-white dark:text-zinc-50 sm:text-3xl"
               >
                 {block.text}
               </h2>
             )
-          case "p":
+          case "p": {
+            const isFirst = firstPara
+            firstPara = false
             return (
               <p
                 key={i}
-                className="mt-6 text-base leading-[1.85] text-zinc-600 dark:text-zinc-300 sm:text-lg"
+                className={`mt-6 text-base leading-[1.85] text-zinc-600 dark:text-zinc-300 sm:text-lg ${
+                  isFirst ? "drop-cap" : ""
+                }`}
               >
                 {block.text}
               </p>
             )
+          }
           case "ul":
             return (
               <ul
                 key={i}
-                className="mt-6 list-disc space-y-3 pl-5 text-base leading-relaxed text-zinc-600 marker:text-indigo-500 dark:text-zinc-300 sm:text-lg"
+                className="mt-6 list-disc space-y-3 pl-5 text-base leading-relaxed text-zinc-600 marker:text-zinc-500 dark:text-zinc-300 sm:text-lg"
               >
                 {block.items.map((item, j) => (
                   <li key={j}>{item}</li>
@@ -36,8 +43,11 @@ export default function PostBody({ blocks }) {
             return (
               <blockquote
                 key={i}
-                className="my-8 border-l-2 border-indigo-500 pl-5 text-lg font-medium italic leading-relaxed text-zinc-900 dark:text-zinc-100 sm:text-xl"
+                className="my-10 border-0 pl-0 font-display text-2xl font-medium italic leading-snug tracking-tight text-white dark:text-zinc-100 sm:text-3xl"
               >
+                <span aria-hidden="true" className="mr-2 select-none text-5xl leading-none text-zinc-300 dark:text-zinc-600">
+                  “
+                </span>
                 {block.text}
               </blockquote>
             )

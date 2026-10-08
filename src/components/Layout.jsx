@@ -2,6 +2,10 @@ import { useEffect } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import Nav from "./Nav"
 import Footer from "./Footer"
+import Subscribe from "./Subscribe"
+import LiveChat from "./LiveChat"
+import LivePresence from "./LivePresence"
+import CookieBanner from "./CookieBanner"
 import ScrollProgress from "./ScrollProgress"
 import Seo from "./Seo"
 import { pageMeta, buildPersonJsonLd, buildWebSiteJsonLd } from "../lib/seo"
@@ -28,8 +32,17 @@ export default function Layout() {
     } else {
       setPost(null)
     }
-    window.scrollTo(0, 0)
   }, [slug])
+
+  // Always start at the top on any page/route change.
+  useEffect(() => {
+    // Bypass CSS `scroll-behavior: smooth` so route changes jump instantly.
+    const root = document.documentElement
+    const prev = root.style.scrollBehavior
+    root.style.scrollBehavior = "auto"
+    window.scrollTo(0, 0)
+    root.style.scrollBehavior = prev
+  }, [pathname])
 
   const meta = isPost
     ? post
@@ -46,6 +59,7 @@ export default function Layout() {
   return (
     <div className="font-sans">
       <Seo {...meta} jsonLd={pathname === "/" ? [buildWebSiteJsonLd(), buildPersonJsonLd()] : null} />
+      <LivePresence />
       <ScrollProgress />
       <Nav />
       <main>
@@ -53,7 +67,10 @@ export default function Layout() {
           <Outlet />
         </div>
       </main>
+      <Subscribe />
       <Footer />
+      <LiveChat />
+      <CookieBanner />
     </div>
   )
 }

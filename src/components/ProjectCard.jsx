@@ -1,84 +1,137 @@
 import { Link } from "react-router-dom"
-import ProductVisual from "./ProductVisual"
-
-const accentStyles = {
-  indigo: {
-    chip: "bg-indigo-50 text-indigo-700 ring-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:ring-indigo-500/30",
-    panel: "from-indigo-600/15 via-indigo-500/5 to-transparent",
-    number: "text-indigo-600 dark:text-indigo-400",
-    dot: "bg-indigo-500",
-    hover: "hover:border-indigo-300 dark:hover:border-indigo-500/60",
-    link: "group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
-  },
-  violet: {
-    chip: "bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-500/15 dark:text-violet-300 dark:ring-violet-500/30",
-    panel: "from-violet-600/15 via-violet-500/5 to-transparent",
-    number: "text-violet-600 dark:text-violet-400",
-    dot: "bg-violet-500",
-    hover: "hover:border-violet-300 dark:hover:border-violet-500/60",
-    link: "group-hover:text-violet-600 dark:group-hover:text-violet-400",
-  },
-  sky: {
-    chip: "bg-sky-50 text-sky-700 ring-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:ring-sky-500/30",
-    panel: "from-sky-600/15 via-sky-500/5 to-transparent",
-    number: "text-sky-600 dark:text-sky-400",
-    dot: "bg-sky-500",
-    hover: "hover:border-sky-300 dark:hover:border-sky-500/60",
-    link: "group-hover:text-sky-600 dark:group-hover:text-sky-400",
-  },
-  emerald: {
-    chip: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30",
-    panel: "from-emerald-600/15 via-emerald-500/5 to-transparent",
-    number: "text-emerald-600 dark:text-emerald-400",
-    dot: "bg-emerald-500",
-    hover: "hover:border-emerald-300 dark:hover:border-emerald-500/60",
-    link: "group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
-  },
-}
+import { useEffect, useState } from "react"
+import Tilt from "./Tilt"
 
 export default function ProjectCard({ project, detailed = false }) {
-  const a = accentStyles[project.accent]
+  const screenshots =
+    project.screenshots?.length > 0
+      ? project.screenshots
+      : project.image
+        ? [project.image]
+        : []
 
-  const handleMove = (e) => {
-    const el = e.currentTarget
-    const r = el.getBoundingClientRect()
-    el.style.setProperty("--spot-x", `${e.clientX - r.left}px`)
-    el.style.setProperty("--spot-y", `${e.clientY - r.top}px`)
+  const [current, setCurrent] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
+
+  useEffect(() => {
+    if (screenshots.length <= 1 || paused) return
+
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % screenshots.length)
+    }, 4000)
+
+    return () => clearInterval(interval)
+  }, [screenshots.length, paused])
+
+  const previous = () => {
+    setCurrent((prev) => (prev === 0 ? screenshots.length - 1 : prev - 1))
   }
 
-  return (
-    <article
-      onMouseMove={handleMove}
-      className={`spotlight group relative flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all dark:border-zinc-800 dark:bg-zinc-900 ${a.hover}`}
-    >
-      <div
-        className={`relative aspect-[16/7] overflow-hidden border-b border-zinc-200/70 bg-gradient-to-br px-6 py-4 dark:border-zinc-800 ${a.panel}`}
-      >
-        <ProductVisual variant={project.visual} accent={project.accent} className="h-full w-full" />
-        <span
-          className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-3 py-1 font-mono text-[10px] font-semibold tracking-wider text-zinc-700 backdrop-blur dark:border-zinc-700/70 dark:bg-zinc-900/80 dark:text-zinc-300`}
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              project.status === "LIVE" ? "bg-emerald-500" : a.dot
-            }`}
-          />
-          {project.status}
-        </span>
-        <span
-          className={`absolute bottom-3 left-5 font-display text-xl italic leading-none ${a.number}`}
-        >
-          {project.index}
-        </span>
-      </div>
+  const next = () => {
+    setCurrent((prev) => (prev + 1) % screenshots.length)
+  }
 
-      <div className="flex flex-1 flex-col p-8 sm:p-9">
-        <h3 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-          {project.name}
-        </h3>
-        <p className="mt-2.5 font-mono text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          {project.tagline}
-        </p>
+  const showSlider = screenshots.length > 0 && !imageFailed
+
+  return (
+    <article className="group">
+      <Tilt>
+        <div
+          className="relative overflow-hidden rounded-2xl bg-zinc-100 p-3 dark:bg-zinc-900"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+        {showSlider ? (
+          <>
+            <div className="aspect-[16/10] overflow-hidden rounded-xl">
+              {screenshots.map((image, index) => (
+                <img
+                  key={image}
+                  src={image}
+                  alt={`${project.name} screenshot ${index + 1}`}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  onError={() => setImageFailed(true)}
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+                    index === current ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {screenshots.length > 1 && (
+              <button
+                type="button"
+                onClick={previous}
+                aria-label={`Previous ${project.name} screenshot`}
+                className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-800 shadow-sm backdrop-blur transition-opacity dark:bg-zinc-900/90 dark:text-white"
+              >
+                ←
+              </button>
+            )}
+
+            {screenshots.length > 1 && (
+              <button
+                type="button"
+                onClick={next}
+                aria-label={`Next ${project.name} screenshot`}
+                className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-zinc-800 shadow-sm backdrop-blur dark:bg-zinc-900/90 dark:text-white"
+              >
+                →
+              </button>
+            )}
+
+            {screenshots.length > 1 && (
+              <div className="absolute right-3 top-3 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[10px] text-white backdrop-blur">
+                {current + 1} / {screenshots.length}
+              </div>
+            )}
+
+            {screenshots.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-black/50 px-2.5 py-2 backdrop-blur">
+                {screenshots.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setCurrent(index)}
+                    aria-label={`Show screenshot ${index + 1}`}
+                    className={`h-1.5 rounded-full transition-all ${
+                      index === current ? "w-5 bg-white" : "w-1.5 bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex aspect-[16/10] flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-zinc-200/70 via-zinc-100/50 to-transparent text-center dark:from-zinc-800/70 dark:via-zinc-900/50 dark:to-transparent">
+            <span className="font-display text-lg italic text-zinc-400 dark:text-zinc-500">
+              {project.name}
+            </span>
+            <span className="rounded-full border border-zinc-200 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
+              Screenshot coming soon
+            </span>
+          </div>
+        )}
+        </div>
+      </Tilt>
+
+      <div className="pt-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-display text-2xl font-semibold tracking-tight text-white transition-colors group-hover:italic dark:text-zinc-100">
+              {project.name}
+            </h3>
+
+            <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {project.tagline}
+            </p>
+          </div>
+
+          <span className="shrink-0 font-mono text-xs text-zinc-400 dark:text-zinc-600">
+            {project.index}
+          </span>
+        </div>
 
         {detailed && project.details && (
           <p className="mt-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -86,24 +139,23 @@ export default function ProjectCard({ project, detailed = false }) {
           </p>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((t) => (
+        <div className="mt-5 flex flex-wrap gap-1.5">
+          {project.tags.map((tag) => (
             <span
-              key={t}
-              className="rounded-md bg-zinc-100 px-2.5 py-1 font-mono text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+              key={tag}
+              className="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:border-zinc-800 dark:text-zinc-400"
             >
-              {t}
+              {tag}
             </span>
           ))}
         </div>
 
-        <div className="mt-auto pt-8">
+        <div className="mt-5">
           <Link
-            to="/contact"
-            className={`inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 transition-colors dark:text-zinc-100 ${a.link}`}
+            to={`/portfolio/${project.slug}`}
+            className="link-swipe gap-2 text-sm font-semibold text-white dark:text-zinc-100"
           >
-            View Case Study
-            <span className="transition-transform group-hover:translate-x-1">→</span>
+            View Project <span aria-hidden>→</span>
           </Link>
         </div>
       </div>

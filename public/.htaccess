@@ -1,0 +1,37 @@
+# Long-lived "expires" / Cache-Control headers for static assets.
+# NOTE: Production (theodesmond.com) runs on Vercel — caching there is
+# controlled by the "headers" section in vercel.json. This file is a fallback
+# for Apache hosts (copied to dist/ via public/) if the same build is ever
+# served from Apache. For NGINX, add an equivalent `expires 30d;` /
+# `expires 1y;` location block (see README / deploy notes).
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Hashed Vite output (/assets/*) — safe to cache for a year (immutable).
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  # Images and fonts.
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/gif "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/avif "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Hashed build assets: immutable for 1 year.
+  <FilesMatch "^index-[A-Za-z0-9]+\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Images / fonts served without a content hash: 30 days + revalidate.
+  <FilesMatch "\.(jpe?g|png|gif|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
+  </FilesMatch>
+  <FilesMatch "\.(woff2?|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

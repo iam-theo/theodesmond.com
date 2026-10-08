@@ -1,10 +1,13 @@
 import Section from "./Section"
-import { mandate } from "../data"
+import { mandate as defaultMandate } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function DigitalMandate({
   eyebrow = "02 · The Digital Mandate",
   title = "The mandate behind the work.",
 }) {
+  const content = useSiteContent()
+  const mandate = content?.mandate ?? defaultMandate
   return (
     <Section id="mandate" eyebrow={eyebrow} title={title}>
       <div className="mt-14 overflow-hidden rounded-3xl bg-indigo-950 text-white">

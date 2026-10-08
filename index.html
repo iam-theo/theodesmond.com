@@ -1,42 +1,91 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (gtag.js) + Consent Mode v2 defaults (must run before gtag loads) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+
+      // Denied by default in privacy-strict regions (GDPR / EEA + UK + CH).
+      // IMPORTANT: edit this list if your requirements change.
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'denied',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500,
+        'regions': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']
+      });
+
+      // Granted by default everywhere else.
+      gtag('consent', 'default', {
+        'ad_storage': 'granted',
+        'ad_user_data': 'granted',
+        'ad_personalization': 'granted',
+        'analytics_storage': 'granted',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'granted',
+        'security_storage': 'granted'
+      });
+
+      // Apply stored choice early (avoids flicker / wrong default on repeat visits).
+      try {
+        var c = localStorage.getItem('td-cookie-consent');
+        if (c === 'granted' || c === 'denied') {
+          gtag('consent', 'update', {
+            'ad_storage': c,
+            'ad_user_data': c,
+            'ad_personalization': c,
+            'analytics_storage': c,
+            'functionality_storage': c,
+            'personalization_storage': c,
+            'security_storage': 'granted'
+          });
+        }
+      } catch (e) {}
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W3EEBSC1S6"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'G-W3EEBSC1S6');
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Theo Desmond is a founder, product architect, full-stack engineer and AI strategist building scalable digital products, intelligent systems and technology ventures from Nigeria."
+      content="Theo Desmond is a founder, product architect, full-stack engineer, AI strategist and digital business consultant helping businesses plan and grow in the digital space."
     />
     <meta
       name="keywords"
-      content="Theo Desmond, product architect, full-stack engineer, AI strategist, software engineer Nigeria, FinTech infrastructure, AI agent infrastructure, digital product development"
-    />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      content="Theo Desmond, product architect, full-stack engineer, AI strategist, digital business consultant, software engineer Nigeria, FinTech infrastructure, AI agent infrastructure, digital product development"
+    /><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="author" content="Theo Desmond" />
     <meta name="theme-color" content="#ffffff" id="theme-color" />
     <link rel="canonical" href="https://theodesmond.com/" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <script>
-      ;(function () {
-        var theme = null
-        try {
-          theme = localStorage.getItem("theme")
-        } catch (e) {}
-        if (theme !== "light" && theme !== "dark") {
-          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-        }
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark")
-          var meta = document.getElementById("theme-color")
-          if (meta) meta.setAttribute("content", "#09090b")
-        }
-      })()
+      // Mark JS-enabled clients before first paint (used to hide the SEO fallback shell flash).
+      try { document.documentElement.classList.add("js") } catch (e) {}
+    </script>
+    <style>
+      html { background: #ffffff; }
+      html.dark { background: #09090b; }
+      /* Hide the prerendered SEO fallback for real visitors (bots without JS still see it). */
+      .js .seo-shell { display: none !important; }
+      #root:empty { min-height: 100vh; }
+    </style>
+    <script>
+      ;(function(){var theme=null;try{theme=localStorage.getItem("theme")}catch(e){}if(theme!=="light"&&theme!=="dark"){theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}if(theme==="dark"){document.documentElement.classList.add("dark");var meta=document.getElementById("theme-color");if(meta)meta.setAttribute("content","#09090b")}})()
     </script>
 
-    <title>Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist</title>
+    <title>Theo Desmond — Product Architect, Full-Stack Engineer</title>
 
-    <meta property="og:title" content="Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist" />
+    <meta property="og:title" content="Theo Desmond — Product Architect, Full-Stack Engineer" />
     <meta
       property="og:description"
       content="Theo Desmond designs and builds scalable digital products, intelligent systems and technology ventures — from product strategy to production infrastructure."
@@ -50,7 +99,7 @@
     <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Theo Desmond — Product Architect, Full-Stack Engineer & AI Strategist" />
+    <meta name="twitter:title" content="Theo Desmond — Product Architect, Full-Stack Engineer" />
     <meta
       name="twitter:description"
       content="Founder, product architect, full-stack engineer and AI strategist building scalable digital products and intelligent systems."
@@ -72,14 +121,15 @@
         "@type": "Person",
         "name": "Theo Desmond",
         "url": "https://theodesmond.com",
-        "jobTitle": "Founder, Product Architect & AI Strategist",
-        "description": "Founder, product architect, full-stack engineer and AI strategist building scalable digital products, intelligent systems and technology ventures.",
+        "jobTitle": "Founder, Product Architect, AI Strategist & Digital Business Consultant",
+        "description": "Founder, product architect, full-stack engineer, AI strategist and digital business consultant helping businesses plan and grow in the digital space.",
         "knowsAbout": [
           "Product Architecture",
           "Full-Stack Engineering",
           "AI & Intelligent Systems",
           "FinTech Infrastructure",
-          "Technology Entrepreneurship"
+          "Technology Entrepreneurship",
+          "Digital Business Consulting"
         ]
       }
     </script>

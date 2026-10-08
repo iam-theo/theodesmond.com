@@ -1,10 +1,14 @@
 import Section from "./Section"
-import { beyondSoftware, beyondSoftwareStatement } from "../data"
+import { beyondSoftware as defaultBeyondSoftware, beyondSoftwareStatement as defaultBeyondSoftwareStatement } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function BeyondSoftware({
   eyebrow = "05 · Beyond Software",
   title = "Technology is bigger than software.",
 }) {
+  const content = useSiteContent()
+  const beyondSoftware = content?.beyondSoftware ?? defaultBeyondSoftware
+  const beyondSoftwareStatement = content?.beyondSoftwareStatement ?? defaultBeyondSoftwareStatement
   return (
     <Section id="beyond-software" eyebrow={eyebrow} title={title}>
       <div className="mt-14 grid gap-14 lg:grid-cols-[1.2fr_1fr] lg:gap-20">

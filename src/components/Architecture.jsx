@@ -1,6 +1,7 @@
 import { useState } from "react"
 import Section from "./Section"
-import { pipeline } from "../data"
+import { pipeline as defaultPipeline, architectureIntro as defaultArchitectureIntro } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 const notes = {
   "Business Problem": "Start with the real constraint: what must change and why it matters.",
@@ -23,12 +24,14 @@ export default function Architecture({
   ),
 }) {
   const [active, setActive] = useState(0)
+  const content = useSiteContent()
+  const pipeline = content?.pipeline ?? defaultPipeline
+  const architectureIntro = content?.architectureIntro ?? defaultArchitectureIntro
 
   return (
     <Section id="architecture" eyebrow={eyebrow} title={title}>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-        Every product moves through the same pipeline — from the business problem to a system
-        that scales. Hover a stage to see how I think about it.
+        {architectureIntro}
       </p>
 
       <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_360px]">

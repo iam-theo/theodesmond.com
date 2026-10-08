@@ -1,107 +1,118 @@
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import Reveal from "./Reveal"
-import { roles, tagline, supporting, heroStats } from "../data"
+import Marquee from "./Marquee"
+import { identity as defaultIdentity, supporting as defaultSupporting, heroStats as defaultHeroStats, roles as defaultRoles, heroWords as defaultHeroWords } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
+
+function RotatingWord({ words }) {
+  const [i, setI] = useState(0)
+
+  useEffect(() => {
+    const t = setInterval(() => setI((v) => (v + 1) % words.length), 2600)
+    return () => clearInterval(t)
+  }, [words.length])
+
+  return (
+    <span key={i} className="rotating-word inline-block italic text-zinc-900 dark:text-zinc-50">
+      {words[i]}
+    </span>
+  )
+}
+
+const DEFAULT_HERO_WORDS = ["businesses.", "technology products.", "intelligent systems.", "ventures."]
 
 export default function Hero() {
+  const content = useSiteContent()
+  const identity = content?.identity ?? defaultIdentity
+  const supporting = content?.supporting ?? defaultSupporting
+  const heroStats = content?.heroStats ?? defaultHeroStats
+  const roles = content?.roles ?? defaultRoles
+  const heroWords = content?.heroWords ?? defaultHeroWords
   return (
-    <section id="top" className="relative overflow-hidden pt-36 pb-28 sm:pt-44 sm:pb-36">
+    <section id="top" className="relative overflow-hidden pb-0 pt-36 sm:pt-44">
       <div
         className="absolute inset-0 -z-10"
         style={{
           backgroundImage:
             "radial-gradient(circle at 1px 1px, rgba(24,24,27,0.05) 1px, transparent 0)",
           backgroundSize: "28px 28px",
-          maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)",
+          maskImage: "radial-gradient(ellipse 90% 70% at 50% 0%, black 35%, transparent 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 90% 70% at 50% 0%, black 35%, transparent 100%)",
         }}
       />
-      <div
-        className="animate-floaty pointer-events-none absolute -top-24 right-[-10%] -z-10 h-[28rem] w-[28rem] rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/20"
+      <span
+        className="ghost-mark -top-12 right-0 -z-10 hidden text-[22rem] leading-none text-zinc-100 lg:block dark:text-white/80"
         aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-[-8%] top-1/3 -z-10 h-[20rem] w-[20rem] rounded-full bg-emerald-400/10 blur-3xl dark:bg-emerald-400/10"
-        aria-hidden="true"
-      />
+      >
+        TD
+      </span>
 
       <div className="layout">
         <Reveal>
-          <div className="inline-flex items-center gap-2.5 rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 dark:border-emerald-500/30 dark:bg-emerald-500/10">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span className="font-mono text-xs font-medium text-emerald-800 dark:text-emerald-300">
-              Currently building: Digital Platforms · AI Systems · FinTech Infrastructure
-            </span>
-          </div>
-
-          <h1 className="mt-8 text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-8xl">
-            Theo <span className="italic text-indigo-600 dark:text-indigo-400">Desmond</span>
-          </h1>
-
-          <p className="mt-7 max-w-4xl font-mono text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-base">
-            {roles.map((role, i) => (
-              <span key={role}>
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">{role}</span>
-                {i < roles.length - 1 && <span className="text-zinc-300 dark:text-zinc-600"> · </span>}
-              </span>
-            ))}
+          <p className="eyebrow text-zinc-400 dark:text-zinc-500">
+            Portfolio — {roles.join(" / ")}
           </p>
+        </Reveal>
 
-          <p className="mt-8 max-w-3xl font-display text-2xl font-medium leading-snug tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-            {tagline}
+        <Reveal delay={80}>
+          <h1 className="mt-8 font-display text-7xl font-semibold leading-[0.95] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-8xl lg:text-[9rem]">
+            Theo <span className="italic font-medium">Desmond</span>
+            <span className="hero-underline mt-5 max-w-[42rem]" aria-hidden="true" />
+          </h1>
+        </Reveal>
+
+        <Reveal delay={160}>
+          <p className="mt-12 max-w-3xl font-display text-2xl font-medium leading-snug tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+            I build <RotatingWord words={heroWords.length ? heroWords : DEFAULT_HERO_WORDS} />
           </p>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
             {supporting}
           </p>
+        </Reveal>
 
+        <Reveal delay={240}>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link to="/portfolio" className="btn btn-primary">
               Explore My Work <span aria-hidden="true">→</span>
             </Link>
-            <Link to="/contact" className="btn btn-secondary">
+            <Link to="/work" className="btn btn-secondary">
               Work With Theo
             </Link>
           </div>
         </Reveal>
 
-        <Reveal delay={150}>
-          <div className="mt-16 border-t border-zinc-100 pt-8 dark:border-zinc-800">
-            <p className="eyebrow">Ventures</p>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <Link
-                to="/ventures"
-                className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 font-mono text-xs font-medium text-zinc-700 transition-colors hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
-              >
-                TD Nwogu Global Enterprise
-                <span className="text-zinc-300 transition-transform group-hover:translate-x-0.5 dark:text-zinc-600">
-                  →
-                </span>
-              </Link>
-              <Link
-                to="/ventures"
-                className="group inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 font-mono text-xs font-medium text-zinc-700 transition-colors hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
-              >
-                Auracle Technologies
-                <span className="text-zinc-300 transition-transform group-hover:translate-x-0.5 dark:text-zinc-600">
-                  →
-                </span>
-              </Link>
+        <Reveal delay={320}>
+          <div className="mt-20">
+            <div className="flex items-center justify-between">
+              <p className="eyebrow">Roles</p>
+              <p className="font-mono text-xs text-zinc-400 dark:text-zinc-500">td/archive</p>
+            </div>
+            <div className="mt-4">
+              {heroStats.map((s, i) => (
+                <div
+                  key={s.label}
+                  className="group flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b border-dashed border-zinc-200 py-5 transition-colors first:border-t dark:border-zinc-800"
+                >
+                  <span className="w-8 shrink-0 font-mono text-xs text-zinc-400 transition-colors group-hover:text-zinc-900 dark:text-zinc-500 dark:group-hover:text-zinc-100">
+                    0{i + 1}
+                  </span>
+                  <span className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+                    {s.label}
+                  </span>
+                  <span className="ml-auto hidden font-mono text-xs text-zinc-400 dark:text-zinc-500 sm:block">
+                    {s.sub}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </Reveal>
+      </div>
 
-        <Reveal delay={240}>
-          <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800 sm:grid-cols-4">
-            {heroStats.map((s) => (
-              <div
-                key={s.label}
-                className="bg-white p-5 transition-colors hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
-              >
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{s.label}</p>
-                <p className="mt-1 font-mono text-xs text-zinc-400 dark:text-zinc-500">{s.sub}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
+      <div className="mt-20 border-y border-zinc-200 dark:border-zinc-800">
+        <Marquee items={identity.split(" → ")} />
       </div>
     </section>
   )

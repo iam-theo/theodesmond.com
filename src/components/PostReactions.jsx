@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
 import { EMOJIS, applyReaction, viewerKey } from "./commentUtils"
-import { supabase, isSupabaseConfigured } from "../lib/supabase"
+import { api } from "../lib/api"
 
 export default function PostReactions({ slug }) {
-  const remote = isSupabaseConfigured
+  const [mode, setMode] = useState("loading") // loading | remote | local
   const storageKey = `td-post-reactions-${slug}`
 
   const [local, setLocal] = useState(() => {
@@ -18,46 +18,43 @@ export default function PostReactions({ slug }) {
   const [picker, setPicker] = useState(false)
 
   useEffect(() => {
-    if (remote) return
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(local))
-    } catch {
-      /* storage full / unavailable */
+    if (mode === "local") {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(local))
+      } catch {
+        /* storage full / unavailable */
+      }
     }
-  }, [remote, storageKey, local])
+  }, [mode, storageKey, local])
 
   useEffect(() => {
-    if (!remote) return
-    let channel
+    let alive = true
+    let timer
 
     const loadAll = async () => {
-      const { data, error } = await supabase
-        .from("post_reactions")
-        .select("*")
-        .eq("post_slug", slug)
-      if (!error) setRows(data || [])
+      try {
+        const data = await api.get(`/api/reactions?post_slug=${encodeURIComponent(slug)}`)
+        if (!alive) return
+        setRows(Array.isArray(data?.post) ? data.post : [])
+        setMode("remote")
+      } catch {
+        if (alive) setMode("local")
+      }
     }
 
     loadAll()
-
-    channel = supabase
-      .channel(`post-reactions-${slug}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "post_reactions", filter: `post_slug=eq.${slug}` },
-        loadAll
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "post_reactions", filter: `post_slug=eq.${slug}` },
-        loadAll
-      )
-      .subscribe()
+    // Poll for fresh counts (replaces realtime channel).
+    timer = setInterval(() => {
+      if (document.visibilityState === "visible") loadAll()
+    }, 15000)
 
     return () => {
-      channel?.unsubscribe()
+      alive = false
+      clearInterval(timer)
     }
-  }, [remote, slug])
+  }, [slug])
+
+  const remote = mode === "remote"
 
   const state = useMemo(() => {
     if (!remote) return local
@@ -75,18 +72,12 @@ export default function PostReactions({ slug }) {
   const react = async (emoji) => {
     const key = viewerKey()
     if (remote) {
-      const { data } = await supabase
-        .from("post_reactions")
-        .select("id")
-        .eq("post_slug", slug)
-        .eq("emoji", emoji)
-        .eq("user_key", key)
-        .maybeSingle()
-      if (data) {
-        await supabase.from("post_reactions").delete().eq("id", data.id)
-      } else {
-        await supabase.from("post_reactions").delete().eq("post_slug", slug).eq("user_key", key)
-        await supabase.from("post_reactions").insert({ post_slug: slug, emoji, user_key: key })
+      try {
+        await api.post("/api/reactions/toggle", { scope: "post", post_slug: slug, emoji, user_key: key })
+        const data = await api.get(`/api/reactions?post_slug=${encodeURIComponent(slug)}`)
+        setRows(Array.isArray(data?.post) ? data.post : [])
+      } catch {
+        /* ignore */
       }
       return
     }

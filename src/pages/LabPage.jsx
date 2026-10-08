@@ -1,25 +1,29 @@
 import { Link } from "react-router-dom"
 import PageHeader from "../components/PageHeader"
 import Lab from "../components/Lab"
+import { useSiteContent } from "../hooks/useSiteContent"
+import { pageHeaders as defaultPageHeaders } from "../data"
 
 export default function LabPage() {
+  const content = useSiteContent()
+  const header = content?.pageHeaders?.lab ?? defaultPageHeaders.lab
   return (
     <>
       <PageHeader
-        eyebrow="Technical Lab"
+        eyebrow={header.eyebrow}
         title={
           <>
-            Not a static CV — <span className="text-indigo-600">an active lab.</span>
+            {header.titleBefore}<span className="text-indigo-600">{header.titleAccent}</span>
           </>
         }
-        description="Things I'm building, testing and shipping right now. Each experiment has a status — some are live, some are experimental, none are finished thinking."
+        description={header.description}
         grid
       >
         <div className="mt-8 flex flex-wrap gap-4">
           <Link to="/ai" className="btn btn-primary">
             Explore AI work
           </Link>
-          <Link to="/contact" className="btn btn-secondary">
+          <Link to="/work" className="btn btn-secondary">
             Collaborate
           </Link>
         </div>

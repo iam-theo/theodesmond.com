@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom"
 import Section from "./Section"
-import { workStories } from "../data"
+import { workStories as defaultWorkStories } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function WorkStories({
   eyebrow = "04 · The Work",
   title = "Turning ideas into systems.",
   intro = "Not a portfolio grid — proof of the philosophy. Each one started as a problem. Each one became a system.",
 }) {
+  const content = useSiteContent()
+  const workStories = content?.workStories ?? defaultWorkStories
   return (
     <Section id="work" eyebrow={eyebrow} title={title}>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">

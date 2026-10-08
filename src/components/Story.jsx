@@ -1,10 +1,14 @@
 import Section from "./Section"
-import { storyParas, storyStages } from "../data"
+import { storyParas as defaultStoryParas, storyStages as defaultStoryStages } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Story({
   eyebrow = "01 · The Story",
   title = "How I got here.",
 }) {
+  const content = useSiteContent()
+  const storyParas = content?.storyParas ?? defaultStoryParas
+  const storyStages = content?.storyStages ?? defaultStoryStages
   return (
     <Section id="story" eyebrow={eyebrow} title={title}>
       <div className="mt-14 grid gap-14 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-20">

@@ -3,11 +3,26 @@ import { useEffect, useState } from "react"
 import PostBody from "../components/PostBody"
 import Comments from "../components/Comments"
 import PostReactions from "../components/PostReactions"
+import PostViews from "../components/PostViews"
 import SharePost from "../components/SharePost"
 import Seo from "../components/Seo"
 import { usePosts } from "../hooks/usePosts"
 import { fetchPost } from "../lib/blogData"
-import { buildArticleJsonLd, pageMeta } from "../lib/seo"
+import {
+  buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
+  buildPostMeta,
+  SITE_URL,
+} from "../lib/seo"
+
+function toIso(value) {
+  if (!value) return ""
+  if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.length === 10 ? `${value}T00:00:00+00:00` : value
+  }
+  const d = new Date(value)
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString()
+}
 
 export default function BlogPostPage() {
   const { slug } = useParams()
@@ -45,18 +60,24 @@ export default function BlogPostPage() {
   const next = (list || [])[index + 1]
   const others = (list || []).filter((p) => p.slug !== slug).slice(0, 3)
 
-  const blogMeta = pageMeta("/blog")
-  const postMeta = {
-    title: `${post.title} — Theo Desmond`,
-    description: post.excerpt || blogMeta.description,
-    keywords: [post.topic, ...blogMeta.keywords],
-    path: `/blog/${slug}`,
-    ogType: "article",
+  const postMeta = buildPostMeta(post, slug)
+  const publishedTime = toIso(post.datePublished || post.date)
+  const modifiedTime = toIso(post.dateModified || post.datePublished || post.date)
+  const article = {
+    publishedTime,
+    modifiedTime,
+    section: post.topic,
+    tags: postMeta.keywords,
+    authorUrl: `${SITE_URL}/about`,
   }
 
   return (
     <article>
-      <Seo {...postMeta} jsonLd={buildArticleJsonLd(post, slug)} />
+      <Seo
+        {...postMeta}
+        article={article}
+        jsonLd={[buildArticleJsonLd(post, slug), buildBreadcrumbJsonLd(post, slug)]}
+      />
       <header className="layout pt-32 sm:pt-40">
         <Link
           to="/blog"
@@ -67,16 +88,22 @@ export default function BlogPostPage() {
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:gap-20">
           <div className="max-w-4xl">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
+            <span className="stamp -rotate-1 border-zinc-300 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">
               {post.topic}
-            </p>
-            <h1 className="mt-4 text-3xl leading-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl lg:text-5xl">
+            </span>
+            <h1 className="mt-5 font-display text-4xl font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-6xl">
               {post.title}
             </h1>
-            <p className="mt-6 flex items-center gap-3 font-mono text-xs text-zinc-500 dark:text-zinc-400">
-              <span>{post.date}</span>
+            <p className="mt-6 flex flex-wrap items-center gap-3 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+              <span>By Theo Desmond</span>
+              <span aria-hidden>·</span>
+              {publishedTime && (
+                <time dateTime={publishedTime}>{post.date}</time>
+              )}
+              {!publishedTime && <span>{post.date}</span>}
               <span aria-hidden>·</span>
               <span>{post.readTime}</span>
+              <PostViews slug={slug} />
             </p>
           </div>
           {post.excerpt && (
@@ -91,6 +118,24 @@ export default function BlogPostPage() {
         <div className="grid gap-14 py-14 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-20 lg:py-20">
           <div className="mx-auto w-full max-w-3xl">
             <PostBody blocks={post.blocks} />
+
+            {postMeta.keywords.length > 0 && (
+              <div className="mt-14 border-t border-dashed border-zinc-200 pt-8 dark:border-zinc-800">
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                  Filed under
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {postMeta.keywords.map((k) => (
+                    <span
+                      key={k}
+                      className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 font-mono text-xs text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+                    >
+                      {k}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <PostReactions slug={slug} />
 
@@ -138,7 +183,7 @@ export default function BlogPostPage() {
                     Theo Desmond
                   </p>
                   <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
-                    Founder · Architect · Engineer
+                    Founder · Architect · Engineer · Consultant
                   </p>
                 </div>
               </div>
@@ -172,7 +217,7 @@ export default function BlogPostPage() {
               </div>
             </div>
 
-            <Link to="/contact" className="btn btn-primary w-full">
+            <Link to="/work" className="btn btn-primary w-full">
               Work With Theo <span aria-hidden="true">→</span>
             </Link>
           </aside>

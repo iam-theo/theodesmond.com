@@ -1,10 +1,13 @@
 import Section from "./Section"
-import { company } from "../data"
+import { company as defaultCompany } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 export default function Company({
   eyebrow = "The Business",
   title = "TD Nwogu Global Enterprise",
 }) {
+  const content = useSiteContent()
+  const company = content?.company ?? defaultCompany
   return (
     <Section id="company" eyebrow={eyebrow} title={title}>
       <div className="mt-12 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800">

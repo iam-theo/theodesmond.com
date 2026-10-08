@@ -1,25 +1,29 @@
 import { Link } from "react-router-dom"
 import PageHeader from "../components/PageHeader"
 import AI from "../components/AI"
+import { useSiteContent } from "../hooks/useSiteContent"
+import { pageHeaders as defaultPageHeaders } from "../data"
 
 export default function AIPage() {
+  const content = useSiteContent()
+  const header = content?.pageHeaders?.ai ?? defaultPageHeaders.ai
   return (
     <>
       <PageHeader
-        eyebrow="AI & The Future"
+        eyebrow={header.eyebrow}
         title={
           <>
-            Building with AI, <span className="text-indigo-600">not just using AI.</span>
+            {header.titleBefore}<span className="text-indigo-600">{header.titleAccent}</span>
           </>
         }
-        description="AI is moving from feature to infrastructure. Agents, RAG, orchestration and sandboxed execution — the systems behind autonomous development."
+        description={header.description}
         grid
       >
         <div className="mt-8 flex flex-wrap gap-4">
           <Link to="/portfolio" className="btn btn-primary">
             See Aurex in the ecosystem
           </Link>
-          <Link to="/contact" className="btn btn-secondary">
+          <Link to="/work" className="btn btn-secondary">
             Talk AI with me
           </Link>
         </div>

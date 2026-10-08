@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import Section from "./Section"
-import { aiCapabilities } from "../data"
+import { aiCapabilities as defaultAiCapabilities, aiIntro as defaultAiIntro } from "../data"
+import { useSiteContent } from "../hooks/useSiteContent"
 
 const lines = [
   { type: "cmd", text: "aurex run --agent architect --task \"scaffold payments core\"" },
@@ -38,9 +39,9 @@ function Terminal() {
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
       <div className="flex items-center gap-2 border-b border-zinc-800 px-5 py-3.5">
-        <span className="h-3 w-3 rounded-full bg-red-500" />
-        <span className="h-3 w-3 rounded-full bg-amber-400" />
-        <span className="h-3 w-3 rounded-full bg-emerald-500" />
+        <span className="h-3 w-3 rounded-full bg-zinc-600" />
+        <span className="h-3 w-3 rounded-full bg-zinc-400" />
+        <span className="h-3 w-3 rounded-full bg-zinc-500" />
         <span className="ml-3 font-mono text-xs text-zinc-500">aurex — ai execution</span>
       </div>
       <div className="h-[320px] space-y-2 overflow-y-auto p-6 font-mono text-[13px] leading-relaxed">
@@ -82,6 +83,9 @@ export default function AI({
     </>
   ),
 }) {
+  const content = useSiteContent()
+  const aiCapabilities = content?.aiCapabilities ?? defaultAiCapabilities
+  const aiIntro = content?.aiIntro ?? defaultAiIntro
   return (
     <Section id="ai" eyebrow={eyebrow} title={title}>
       <div className="mt-12 grid items-start gap-12 lg:grid-cols-2">
@@ -98,9 +102,7 @@ export default function AI({
             ))}
           </ul>
           <p className="mt-8 max-w-xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-            AI is moving from feature to infrastructure. I build the systems where agents
-            plan, generate, execute and automate — powered by RAG, orchestration and
-            sandboxed execution.
+            {aiIntro}
           </p>
         </div>
 

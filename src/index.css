@@ -6,6 +6,83 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Black & white theme — keep semantic colors for accessibility, map decorative to zinc */
+  /* Indigo = brand/primary/focus (keep distinct) */
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+  --color-indigo-950: #1e1b4b;
+
+  /* Emerald = success states (keep distinct) */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+
+  /* Rose = error/destructive states (keep distinct) */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+  --color-rose-800: #9f1239;
+  --color-rose-900: #881337;
+
+  /* Amber = warning states (keep distinct) */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+
+  /* Violet & Sky = map to zinc (decorative only) */
+  --color-violet-50: var(--color-zinc-50);
+  --color-violet-100: var(--color-zinc-100);
+  --color-violet-200: var(--color-zinc-200);
+  --color-violet-300: var(--color-zinc-300);
+  --color-violet-400: var(--color-zinc-400);
+  --color-violet-500: var(--color-zinc-500);
+  --color-violet-600: var(--color-zinc-600);
+  --color-violet-700: var(--color-zinc-700);
+  --color-violet-800: var(--color-zinc-800);
+  --color-violet-900: var(--color-zinc-900);
+
+  --color-sky-50: var(--color-zinc-50);
+  --color-sky-100: var(--color-zinc-100);
+  --color-sky-200: var(--color-zinc-200);
+  --color-sky-300: var(--color-zinc-300);
+  --color-sky-400: var(--color-zinc-400);
+  --color-sky-500: var(--color-zinc-500);
+  --color-sky-600: var(--color-zinc-600);
+  --color-sky-700: var(--color-zinc-700);
+  --color-sky-800: var(--color-zinc-800);
+  --color-sky-900: var(--color-zinc-900);
+
+  /* Custom brand colors */
+  --color-white: #0a1128;
+  --color-zinc-950: #050c1a;
 }
 
 html {
@@ -15,6 +92,24 @@ html {
 body {
   @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
   font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+/* Paper grain — kills the flat sterile look without breaking the B&W theme */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    opacity: 0.2;
+  }
 }
 
 h1,
@@ -60,7 +155,7 @@ h4 {
 }
 
 .btn-secondary {
-  @apply border border-zinc-300 bg-white text-zinc-900 hover:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-400;
+  @apply border border-zinc-300 bg-white text-white hover:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-400;
 }
 
 /* --- Motion system --- */
@@ -68,16 +163,141 @@ h4 {
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px) scale(0.995);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
 .page-enter {
-  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Marquee strips --- */
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- Hero rotating word + underline draw --- */
+
+@keyframes draw-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-underline {
+  display: block;
+  height: 0.14em;
+  background: linear-gradient(90deg, #e4e4e7, #a1a1aa);
+  transform-origin: left;
+  animation: draw-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.7s;
+}
+
+.dark .hero-underline {
+  background: linear-gradient(90deg, #e4e4e7, #a1a1aa);
+}
+
+@keyframes word-rotate-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em) skewY(3deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0);
+  }
+}
+
+.rotating-word {
+  animation: word-rotate-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Ink stamp chips --- */
+
+.stamp {
+  @apply inline-flex items-center gap-1.5 rounded-md border border-dashed px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap;
+  transform: rotate(-1deg);
+}
+
+.stamp:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+/* --- Editorial index rows --- */
+
+.editorial-row {
+  @apply grid items-center gap-x-8 gap-y-2 border-b border-dashed py-7 transition-colors;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto 2rem;
+}
+
+.editorial-row:hover .ed-arrow,
+.editorial-row:focus-visible .ed-arrow {
+  @apply translate-x-1.5 text-white dark:text-zinc-50;
+}
+
+.editorial-row .ed-arrow {
+  @apply transition-transform duration-300;
+}
+
+/* --- Link underline draw --- */
+
+.link-swipe {
+  @apply relative inline-flex;
+}
+
+.link-swipe::after {
+  content: "";
+  @apply absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 transition-transform duration-300;
+  background: currentColor;
+}
+
+.link-swipe:hover::after,
+.link-swipe:focus-visible::after {
+  @apply scale-x-100;
+}
+
+/* --- Blog drop cap --- */
+
+.drop-cap::first-letter {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding-right: 0.14em;
+  padding-top: 0.08em;
+  margin-right: 0.08em;
+}
+
+/* --- Ghost watermark text --- */
+
+.ghost-mark {
+  @apply pointer-events-none absolute font-display italic leading-none select-none;
 }
 
 .reveal {
@@ -134,6 +354,24 @@ h4 {
   animation: floaty 7s ease-in-out infinite;
 }
 
+/* --- Thinking dots blink --- */
+
+@keyframes think-blink {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-think {
+  display: inline-block;
+  animation: think-blink 1.2s ease-in-out infinite;
+  letter-spacing: 0.1em;
+}
+
 /* --- Spotlight hover --- */
 
 .spotlight {
@@ -174,7 +412,14 @@ h4 {
   }
   .animate-dash,
   .animate-softpulse,
-  .animate-floaty {
+  .animate-floaty,
+  .animate-think,
+  .marquee-track,
+  .rotating-word,
+  .hero-underline {
     animation: none !important;
+  }
+  .hero-underline {
+    opacity: 1;
   }
 }

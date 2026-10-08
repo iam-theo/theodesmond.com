@@ -17,6 +17,17 @@ export function viewerKey() {
   return key
 }
 
+export function maskEmail(email) {
+  if (!email) return ""
+  const at = email.indexOf("@")
+  if (at <= 0) return "***"
+  const user = email.slice(0, at).slice(0, 2) + "***"
+  const domain = email.slice(at + 1)
+  const [dom, tld = ""] = domain.split(".")
+  const maskedDomain = (dom.slice(0, 2) + "***") + (tld ? "." + tld : "")
+  return `${user}@${maskedDomain}`
+}
+
 export function applyReaction(comment, emoji, key) {
   const reactions = { ...(comment.reactions || {}) }
   const viewer = { ...(comment.viewer || {}) }
